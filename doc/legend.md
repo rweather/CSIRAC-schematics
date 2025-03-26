@@ -1,6 +1,12 @@
 Legend for CSIRAC logic symbols
 ===============================
 
+Some of the schematic diagrams are "logical" descriptions that show the
+logic gates of the component without all the messy details of valves.
+However, the CSIRAC was designed before the standard logic symbols we
+know and love today were invented.  This file provides a legend for
+interpreting the CSIRAC's logical diagrams.
+
 ## AND gates
 
 AND gates are represented by a circle with a 2, 3, or 4 in it,
@@ -49,21 +55,22 @@ SR flip-flops are represented by a rounded rectangle:
 Sometimes the set (S) input is labeled, but usually you have to figure out
 which input is S and which input is R from context.
 
-## Terminals
+## Plugs
 
-Terminals are the interconnects between major components.  They are
-represented by two concentric circles, accompanied by the label:
+Plugs are the interconnects between major components.  They are represented
+by two concentric circles, accompanied by the label:
 
-<img src="terminal-1-symbol.png"/>
+<img src="plug-1-symbol.png"/>
 
 The labels are very unhelpful at indicating what they mean: P2-1, P13, etc.
+See [Plugs](plugs.md) for a list of plugs and their uses.
 
-A label with a dash in it indicates that the terminal has multiple lines;
+A label with a dash in it indicates that the plug has multiple lines;
 usually a bus.  The diagram above uses lines 1 and 3 of bus P2.
 
-There are times where an entire bus is represented by a single terminal.
+There are times where an entire bus is represented by a single plug name.
 Such cases have a rectangle attached to the outer circle:
 
-<img src="terminal-2-symbol.png"/>
+<img src="plug-2-symbol.png"/>
 
-P3 and P4 are buses for the multi-bit source and destination opcodes.
+P3 and P4 are the buses for the multi-bit source and destination opcodes.
