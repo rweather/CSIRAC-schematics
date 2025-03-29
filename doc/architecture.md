@@ -204,8 +204,7 @@ The following no-operation corresponds to the instruction with all zero bits:
     (0 M) -> 0 M
 
 Executing <tt>(0 M) -> 0 M</tt> usually indicates that the program has
-jumped off into unused memory.  The emulator treats this as an
-"illegal instruction" and stops the program.
+jumped off into unused memory.
 
 ## Pointers and Arrays
 
