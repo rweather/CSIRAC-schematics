@@ -9,11 +9,11 @@ collects up the names of the known signals.
 
 When the plug name contains a dash, it indicates a bus with multiple pins.
 For example, the P15 bus has pins P15-1 to P15-20 for the bits of the
-current instruction word.  Bus pinouts are in separate sections below.
+current 20-bit word.  Bus pinouts are in separate sections below.
 
 <table border="1">
 <tr><td><b>Plug</b></td><td><b>Description</b></td><td><b>Schematic</b></td></tr>
-<tr><td>P1</td><td>???</td><td>AO2, AO3, Hooter / Start Unit, Constant Generator, Magnetic Drum Sequence Unit, Constant Generator, Mk II Sequence Register, Sequence Register Logical, Trigger Unit, Interpreter</td></tr>
+<tr><td>P1</td><td>???</td><td>Clock, AO2, AO3, Hooter / Start Unit, Constant Generator, Magnetic Drum Sequence Unit, Constant Generator, Mk II Sequence Register, Sequence Register Logical, Trigger Unit, Interpreter</td></tr>
 <tr><td>P1a - P1f</td><td>Delay line taps for delayed versions of P1</td><td>Hooter / Start Unit, Adder, Sequence Register Logical</td></tr>
 <tr><td>P2</td><td>Bus for timing signals; see below for further details</td><td>Everywhere</td></tr>
 <tr><td>P3</td><td>Bus for source opcode control lines; see below for further details</td><td>Everywhere</td></tr>
@@ -22,14 +22,15 @@ current instruction word.  Bus pinouts are in separate sections below.
 <tr><td>P6</td><td>OUTPUT TRUNK</td><td>AO2, Memory Output Gates, Magnetic Drum Store, Magnetic Drum Sequence Unit, Constant Generator, Time Selector Mk II, Sequence Register Logical, Interpreter</td></tr>
 <tr><td>P6A</td><td>???</td><td>Magnetic Drum Sequence Unit</td></tr>
 <tr><td>P7</td><td>???</td><td>Line Selector, Time Selector Mk II, Sequence Register Logical, Trigger Unit, Interpreter</td></tr>
-<tr><td>P8</td><td>???</td><td>Chain Unit</td></tr>
-<tr><td>P9</td><td>???</td><td>AO2, Sequence Unit Mk II, Hooter / Start Unit, Time Selector Mk II, Interpreter</td></tr>
-<tr><td>P10</td><td>C PULSES</td><td>AO2</td></tr>
-<tr><td>P11</td><td>???</td><td>Multiplier Sequence Unit, Chain Unit</td></tr>
+<tr><td>P8</td><td>???</td><td>Clock, Chain Unit</td></tr>
+<tr><td>P9</td><td>???</td><td>Clock, AO2, Sequence Unit Mk II, Hooter / Start Unit, Time Selector Mk II, Interpreter</td></tr>
+<tr><td>P10</td><td>C PULSES</td><td>Clock, AO2</td></tr>
+<tr><td>P11</td><td>???</td><td>Clock, Multiplier Sequence Unit, Chain Unit</td></tr>
 <tr><td>P13</td><td>TC</td><td>AO3, Memory Input Gates, Memory Output Gates, C Register, D Register, H Register, Time Selector Mk II, Memory Logical, Mk II Sequence Register, Sequence Register Logical, Interpreter</td></tr>
 <tr><td>P13-2</td><td>???</td><td>Sequence Unit Mk II</td></tr>
-<tr><td>P15</td><td>Bus for the current instruction; see below for further details</td><td>Everywhere</td></tr>
+<tr><td>P15</td><td>Bus for the current 20-bit word; see below for further details</td><td>Everywhere</td></tr>
 <tr><td>P16</td><td>???</td><td>AO2</td></tr>
+<tr><td>P17-1</td><td>???</td><td>Clock</td></tr>
 <tr><td>P18</td><td>???</td><td>Magnetic Drum Store, Memory Input Gates, Memory Logical</td></tr>
 <tr><td>P19</td><td>STOP PULSE</td><td>Sequence Unit Mk II, AO4, Magnetic Drum Sequence Unit, Output Regsiter Logical, C Register, Trigger Unit</td></tr>
 <tr><td>P21</td><td>???</td><td>AO2</td></tr>
@@ -110,6 +111,9 @@ timing signals P2-1 to P2-10 compare with the input clock C:
 
 ## P3 Bus - Source Opcode Control Lines
 
+See the [architecture description](architecture.md) for more information
+on the instruction set.
+
 <table border="1">
 <tr><td><b>Pin</b></td><td><b>Description</b></td><td><b>Opcode Number</b></td></tr>
 <tr><td>1</td><td>Source is (Dn) - contents of the Dn register</td><td>17</td></tr>
@@ -158,6 +162,9 @@ timing signals P2-1 to P2-10 compare with the input clock C:
 
 ## P4 Bus - Destination Opcode Control Lines
 
+See the [architecture description](architecture.md) for more information
+on the instruction set.
+
 <table border="1">
 <tr><td><b>Pin</b></td><td><b>Description</b></td><td><b>Opcode Number</b></td></tr>
 <tr><td>1</td><td>Destination is Dn - copy the working value to the Dn register</td><td>17</td></tr>
@@ -204,30 +211,30 @@ timing signals P2-1 to P2-10 compare with the input clock C:
 <tr><td>J</td><td>Q output of the SR flip-flop for bit 1 of the destination opcode</td><td> </td></tr>
 </table>
 
-## P15 Bus - Current Instruction
+## P15 Bus - Current Word
 
 <table border="1">
 <tr><td><b>Pin</b></td><td><b>Description</b></td></tr>
-<tr><td>1</td><td>Bit 1 of the current instruction (LSB)</td></tr>
-<tr><td>2</td><td>Bit 2 of the current instruction</td></tr>
-<tr><td>3</td><td>Bit 3 of the current instruction</td></tr>
-<tr><td>4</td><td>Bit 4 of the current instruction</td></tr>
-<tr><td>5</td><td>Bit 5 of the current instruction</td></tr>
-<tr><td>6</td><td>Bit 6 of the current instruction</td></tr>
-<tr><td>7</td><td>Bit 7 of the current instruction</td></tr>
-<tr><td>8</td><td>Bit 8 of the current instruction</td></tr>
-<tr><td>9</td><td>Bit 9 of the current instruction</td></tr>
-<tr><td>10</td><td>Bit 10 of the current instruction</td></tr>
-<tr><td>11</td><td>Bit 11 of the current instruction</td></tr>
-<tr><td>12</td><td>Bit 12 of the current instruction</td></tr>
-<tr><td>13</td><td>Bit 13 of the current instruction</td></tr>
-<tr><td>14</td><td>Bit 14 of the current instruction</td></tr>
-<tr><td>15</td><td>Bit 15 of the current instruction</td></tr>
-<tr><td>16</td><td>Bit 16 of the current instruction</td></tr>
-<tr><td>17</td><td>Bit 17 of the current instruction</td></tr>
-<tr><td>18</td><td>Bit 18 of the current instruction</td></tr>
-<tr><td>19</td><td>Bit 19 of the current instruction</td></tr>
-<tr><td>20</td><td>Bit 20 of the current instruction (MSB)</td></tr>
+<tr><td>1</td><td>Bit 1 of the current word (LSB)</td></tr>
+<tr><td>2</td><td>Bit 2 of the current word</td></tr>
+<tr><td>3</td><td>Bit 3 of the current word</td></tr>
+<tr><td>4</td><td>Bit 4 of the current word</td></tr>
+<tr><td>5</td><td>Bit 5 of the current word</td></tr>
+<tr><td>6</td><td>Bit 6 of the current word</td></tr>
+<tr><td>7</td><td>Bit 7 of the current word</td></tr>
+<tr><td>8</td><td>Bit 8 of the current word</td></tr>
+<tr><td>9</td><td>Bit 9 of the current word</td></tr>
+<tr><td>10</td><td>Bit 10 of the current word</td></tr>
+<tr><td>11</td><td>Bit 11 of the current word</td></tr>
+<tr><td>12</td><td>Bit 12 of the current word</td></tr>
+<tr><td>13</td><td>Bit 13 of the current word</td></tr>
+<tr><td>14</td><td>Bit 14 of the current word</td></tr>
+<tr><td>15</td><td>Bit 15 of the current word</td></tr>
+<tr><td>16</td><td>Bit 16 of the current word</td></tr>
+<tr><td>17</td><td>Bit 17 of the current word</td></tr>
+<tr><td>18</td><td>Bit 18 of the current word</td></tr>
+<tr><td>19</td><td>Bit 19 of the current word</td></tr>
+<tr><td>20</td><td>Bit 20 of the current word (MSB)</td></tr>
 </table>
 
 ## P102 Bus - Magnetic Drum Interface
