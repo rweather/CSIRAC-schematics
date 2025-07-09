@@ -176,6 +176,85 @@ Other
 * [Detail 6](drawings/295132-large-detail-6.jpg) (Drawing)
 * [Detail 7](drawings/227012-large-detail-7.jpg) (Drawing)
 
+## Emulator and other tools
+
+The "tools" directory of this repository contains an emulator written in C
+for running original CSIRAC code.  Unlike the original Windows 98 emulator,
+this emulator does not try to replicate the toggle switch experience or
+the speed of the original computer.  It will run as fast as your host
+machine can manage.
+
+The emulator can be built on Linux and similar systems using cmake and a
+C compiler:
+
+    mkdir build
+    cd build
+    cmake ..
+    make
+    make install
+
+By default, the emulator, assembler, and disassembler will be installed
+into `/usr/local`.  This can be changed when the project is configured
+with cmake:
+
+    cmake -DCMAKE_INSTALL_PREFIX=$HOME/csirac-install ..
+
+Once installed, you can run program tapes from the library with the
+`csirac` utility.  The following tests teleprinter output by printing the
+full teleprinter character set 20 times to standard output:
+
+    $ csirac T007
+    ABCDEFGHIJKLMNOPQRSTUVWXYZΛ
+    0123456789+-.)(ijk∇ϕψθΩΓπΣΞ
+    ABCDEFGHIJKLMNOPQRSTUVWXYZΛ
+    0123456789+-.)(ijk∇ϕψθΩΓπΣΞ
+    ABCDEFGHIJKLMNOPQRSTUVWXYZΛ
+    0123456789+-.)(ijk∇ϕψθΩΓπΣΞ
+    ...
+
+A full list of the available library tapes can be found in
+[library/README.md](library/README.md).
+
+The `.cvt` files in the library are in the same "CSIRAC Virtual Tape"
+format that was used by the [Windows 98 emulator](https://cis.unimelb.edu.au/about/csirac/emulator), with some slight extensions to allow specifying the
+type of teleprinter, input tape, or output punch to use in metadata lines
+that start with a plus sign (+).  For example, this declaration says that
+the program outputs to a Flexowriter rather than the original teleprinter:
+
+    +Ot=flexowriter
+
+Hand-assembling tapes in `.cvt` format can be tedious.  I have written a
+brand new assembler in C that can help in writing new programs for the CSIRAC.
+See the [CSIRAC new assembler](doc/assembler.md) documentation for more
+information.  The `.cna` files in the tape library use this new
+assembly syntax, based on the original CSIRO syntax from the programming
+manual.
+
+The assembler will automatically add metadata lines to output `.cvt`
+files when non-default device types are used by the assembly code.
+
+The emulator extends the CSIRAC design in a few ways.  I tried to keep
+the extensions mostly within the realm of "They may have actually
+done this if the project had continued":
+
+* Programs run automatically without a dance of toggle switches to bootstrap
+  the primary routine into memory first.
+* Support for ASCII teletypes which were becoming available in the 1960's.
+* Support for 8-hole tape for binary input and output of byte-oriented data.
+
+The following features make the emulator easier to use:
+
+* Teleprinters, Flexowriters, and ASCII teletypes can be used directly as
+  input tapes without needing to convert to 5-hole or 8-hole punched
+  format first.
+* An instruction with all zero bits is an "illegal instruction" and will
+  halt the machine.  Jumping off into uninitialised memory will cause
+  this to happen.
+* Tapes in `.cvt` format can declare the type of teleprinter, input tape,
+  or output punch in metadata lines that start with a plus sign (+).
+  This helps the emulator choose an appropriate tape or teleprinter format.
+  Think of the metadata as a primitive job control language.
+
 ## CSIRAC in person
 
 Here are some photos of the CSIRAC that I took in 2012 when I visited

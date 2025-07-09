@@ -1,0 +1,19 @@
+;
+; Prints "HELLO WORLD" to the teleprinter.
+;
+start:
+    "H" -> Ot
+    "E" -> Ot
+    "L" -> Ot
+    "L" -> Ot
+    "O" -> Ot
+    " " -> Ot
+    "W" -> Ot
+    "O" -> Ot
+    "R" -> Ot
+    "L" -> Ot
+    "D" -> Ot
+    "\r" -> Ot
+    "\n" -> Ot
+    p20 -> T
+    .entry start

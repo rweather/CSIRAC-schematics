@@ -1,0 +1,42 @@
+;
+; Flexowriter test.  Prints all visible characters multiple times.
+;
+    .title  "T007f - Flexowriter teleprinter test."
+    .flexowriter
+start:
+    19      -> A        ; 20 iterations until D0 goes negative.
+    (A)     -> D0
+loop0:
+    29      -> Ot       ; CR
+    31      -> Ot       ; LF
+    30      -> Ot       ; Force the Flexowriter into letter shift.
+    1       -> A
+    25      -> C        ; 26 iterations until C goes negative.
+loop1:
+    (A)     -> Ot       ; Print the current character.
+    1       -> +A
+    1       -> -C
+    s(C)    -> cS       ; Are we at the end?
+    loop1   -> S
+;
+    29      -> Ot       ; CR
+    31      -> Ot       ; LF
+    27      -> Ot       ; Force the Flexowriter into figure shift.
+    1       -> A
+    25      -> C        ; 26 iterations until C goes negative.
+loop2:
+    (A)     -> Ot       ; Print the current character.
+    1       -> +A
+    1       -> -C
+    s(C)    -> cS       ; Are we at the end?
+    loop2   -> S
+;
+    1       -> -D0      ; Do we need to repeat the test some more?
+    s(D0)   -> cS
+    loop0   -> S
+;
+    30      -> Ot       ; Force the Flexowriter back into letter shift.
+    29      -> Ot       ; CR
+    31      -> Ot       ; LF
+    p20     -> T        ; Halt
+    .entry  start

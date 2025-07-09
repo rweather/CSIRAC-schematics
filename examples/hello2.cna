@@ -1,0 +1,36 @@
+.ascii
+
+;
+; Print the NUL-terminated string pointed to by C to the teleprinter.
+;
+; Destroys C and H.
+;
+.function print,D15
+next_pair:
+    (C) -> +K       ; Get the next character from the upper half
+    (0 M) -> Hu     ; of the word pointed to by C.
+    (Hl) -> cS      ; Skip next instruction if the character is not NUL.
+    .return         ; Return from the subroutine if the character is NUL.
+    (Hl) -> Ot      ; Output the character to the teleprinter.
+    (C) -> +K       ; Get the next character from the lower half
+    (0 M) -> Hl     ; of the word pointed to by C.
+    (Hl) -> cS      ; Skip next instruction if the character is not NUL.
+    .return         ; Return from the subroutine if the character is NUL.
+    (Hl) -> Ot      ; Output the character to the teleprinter.
+    1 -> +C         ; Increment C to point to the next string word.
+    next_pair -> S  ; Jump back to the top of the loop.
+;.endfunction
+
+string1:
+    .dh "THIS IS A TEST\r\n",0
+string2:
+    .dh "HELLO WORLD\r\n",0
+
+main:
+    string1 -> C    ; Load a pointer to string1 into C.
+    .call print     ; Print string1.
+    string2 -> C    ; Load a pointer to string2 into C.
+    .call print     ; Print string2.
+    p20 -> T        ; Halt the machine.
+
+.entry main

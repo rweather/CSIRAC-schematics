@@ -1,0 +1,7 @@
+;
+; Sound the hooter.
+;
+hooter:
+    31, 31 -> P
+    31, 30 -> +S
+    .entry hooter

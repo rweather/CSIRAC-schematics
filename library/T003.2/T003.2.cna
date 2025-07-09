@@ -1,0 +1,33 @@
+;
+; T003.2 - Dump the contents of memory words to tape with compression.
+;
+; The starting memory location must be in the upper bits 10 bits of N1,
+; with the lower 10 bits set to zero.  The number of words (minus 1) to
+; punch must be in the lower 10 bits of N2.
+;
+; If the upper 10 bits of a program word is zero, it will not be punched.
+;
+; To save space in memory, we don't use the control part of the bootstrap.
+; The primary plus this code occupies the first 34 words in memory.
+;
+    .title  "T003.2 - Dump the contents of memory to tape in 12-hole format."
+    .punch12
+start:
+    (N1)    -> C        ; Transfer the starting memory address to C.
+    (N2)    -> D0       ; Transfer the number of words to punch minus 1 to D0.
+loop:
+    (C)     -> +K       ; Read the next memory word into A.
+    (0 M)   -> A
+    p11     -> +C       ; Increment the pointer in C.
+    (A)     -> Hu       ; Transfer the upper bits into H.
+    (Hl)    -> cS       ; Skip the next instruction if H is non-zero.
+    1       -> +S       ; Skip punching the upper bits if H is zero.
+    (Hl)    -> Op       ; Punch the upper bits.
+    (Hu)    -> -A       ; Clear the upper bits from A.
+    8, 0    -> +A       ; Add the X punch bit.
+    (A)     -> Op       ; Punch the lower bits together with the X punch.
+    p1      -> -D0      ; Decrement D0 and jump if it is still positive.
+    s(D0)   -> cS
+    loop    -> S
+    p20     -> T        ; Halt
+    .entry start

@@ -1,0 +1,127 @@
+;
+; Tape Symbol Print
+;
+; This program prints an input 12-hole punch tape (or .cvt file) to the
+; teleprinter in Melbourne syntax form.
+;
+; This is not the original code.  It is a new implementation.
+;
+; The program stops after reading 10 blank (0, 0) lines.  We assume that
+; we have run off the end of the tape at that point.
+;
+    .title  "T002 - Tape Symbol Print"
+    .tape12                 ; Input is expected to be 12-hole punch tape.
+
+;
+; Print a pair of characters from A.  Destroys H.
+;
+.function ppair,D15
+    (A)     -> Hu
+    (Hl)    -> Ot
+    (A)     -> Hl
+    (Hl)    -> Ot
+.endfunction
+;
+; Print the two 5-bit groups in the upper half of D0.
+;
+; Destroys A, B, and H.
+;
+.function pgrps,D14
+    (D0)    -> A            ; Extract the top-most group in D0.
+    r(A)    -> A            ; Shift right by 5 bits.
+    r(A)    -> A
+    r(A)    -> A
+    r(A)    -> A
+    r(A)    -> A
+    0, 31   -> B
+    (B)     -> .A
+    (A)     -> +K
+    (num M) -> A
+    .call ppair             ; Print the top-most group.
+    " "     -> Ot           ; Print a space between the groups.
+    (D0)    -> A            ; Extract the next to top-most group in D0.
+    (B)     -> .A
+    (A)     -> +K
+    (num M) -> A
+    .call ppair             ; Print the next to top-most group.
+.endfunction
+
+main:
+    (Z)     -> D0           ; Clear the in-progress word.
+    (Z)     -> D1           ; We haven't seen the first Y punch yet.
+    (count) -> C            ; Count zero words to determine when the tape ends.
+;
+next:
+    (I)     -> B            ; Read the next symbol from the tape.
+    (B)     -> Hl           ; Extract the low 10 bits of the symbol into H.
+    p11     -> A            ; If p11 is set, then we have reached the
+    (B)     -> .A           ; end of the input tape.  FIXME: Use zero instead.
+    (A)     -> cS
+    checky  -> S
+    p20     -> T            ; Halt the program at the end of the input tape.
+;
+checky:
+    s(A)    -> cS           ; Is the Y bit set?
+    checkx  -> S
+;
+; We have a Y punch.  Figure out what type of command we have.
+;
+    (D1)    -> cS           ; Is this the first Y punch?
+    firsty  -> S            ; If so, it is always "m nY".
+    ; TODO: handle Y
+firsty:
+    (Z)     -> D0           ; Clear the in-progress word.
+    next    -> S            ; Go back for the next tape symbol.
+;
+checkx:
+    2(A)    -> A            ; Is the X bit set?
+    s(A)    -> cS
+    normal  -> S
+;
+; We have an X punch
+;
+    ; TODO: handle X
+    (Z)     -> D0           ; Clear the in-progress word.
+    next    -> S            ; Go back for the next tape symbol.
+;
+normal:
+    (Hu)    -> D0           ; Remember the 10 bits of this symbol for later.
+    (Hl)    -> cS           ; Is H set to all zeroes?
+    checkz  -> S
+    (count) -> C            ; H is non-zero, so reset the zero counter.
+    next    -> S            ; Go back for the next tape symbol.
+;
+checkz:
+    1       -> +C           ; Count zeroes to see if we have run out of tape.
+    s(C)    -> cS
+    p20     -> T            ; Halt when the zero counter overflows.
+    next    -> S
+
+;
+; Y punch command code names for commands 0 to 6.
+;
+ycmd:
+    .dw     "TS--R-D"
+;
+; List of source gates for instructions, two characters per item.
+;
+src:
+    .dh     " M INANB ASAHATALACAZA B RRB CSCRC DSDRD ZHLHU SPEPL KMAMBMCMDPS"
+;
+; List of destination gates for instructions, two characters per item.
+;
+dest:
+    .dh     " M IOTOP APASACADANA P BXB L CPCSC DPDSD ZHLHU SPSCSPKMAMBMCMD T"
+;
+; Helper table for printing numbers 0 to 31, with zero shown as spaces.
+;
+num:
+    .dh     "   1 2 3 4 5 6 7 8 9"
+    .dh     "10111213141516171819"
+    .dh     "20212223242526272829"
+    .dh     "3031"
+
+count:
+    .dd     -10             ; Adjust this to set the maximum zero counter.
+
+    .entry  main

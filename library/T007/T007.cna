@@ -1,0 +1,42 @@
+;
+; Teleprinter test.  Prints all visible characters multiple times.
+;
+    .title  "T007 - Teleprinter test."
+    .teleprinter
+start:
+    19      -> A        ; 20 iterations until D0 goes negative.
+    (A)     -> D0
+loop0:
+    30      -> Ot       ; CR
+    29      -> Ot       ; LF
+    28      -> Ot       ; Force the teleprinter into letter shift.
+    (Z)     -> A
+    26      -> C        ; 27 iterations until C goes negative.
+loop1:
+    (A)     -> Ot       ; Print the current character.
+    1       -> +A
+    1       -> -C
+    s(C)    -> cS       ; Are we at the end?
+    loop1   -> S
+;
+    30      -> Ot       ; CR
+    29      -> Ot       ; LF
+    27      -> Ot       ; Force the teleprinter into figure shift.
+    (Z)     -> A
+    26      -> C        ; 27 iterations until C goes negative.
+loop2:
+    (A)     -> Ot       ; Print the current character.
+    1       -> +A
+    1       -> -C
+    s(C)    -> cS       ; Are we at the end?
+    loop2   -> S
+;
+    1       -> -D0      ; Do we need to repeat the test some more?
+    s(D0)   -> cS
+    loop0   -> S
+;
+    28      -> Ot       ; Force the teleprinter back into letter shift.
+    30      -> Ot       ; CR
+    29      -> Ot       ; LF
+    p20     -> T        ; Halt
+    .entry  start

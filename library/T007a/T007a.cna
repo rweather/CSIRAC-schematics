@@ -1,0 +1,39 @@
+;
+; ASCII teletype test.  Prints all characters 32 - 126 multiple times.
+;
+    .title  "T007a - ASCII teletype test."
+    .ascii
+start:
+    19      -> A        ; 20 iterations until D0 goes negative.
+    (A)     -> D0
+loop0:
+    13      -> Ot       ; CR
+    10      -> Ot       ; LF
+    32      -> A
+    47      -> C        ; 48 iterations until C goes negative.
+loop1:
+    (A)     -> Ot       ; Print the current character.
+    1       -> +A
+    1       -> -C
+    s(C)    -> cS       ; Are we at the end?
+    loop1   -> S
+;
+    13      -> Ot       ; CR
+    10      -> Ot       ; LF
+    80      -> A
+    46      -> C        ; 47 iterations until C goes negative.
+loop2:
+    (A)     -> Ot       ; Print the current character.
+    1       -> +A
+    1       -> -C
+    s(C)    -> cS       ; Are we at the end?
+    loop2   -> S
+;
+    1       -> -D0      ; Do we need to repeat the test some more?
+    s(D0)   -> cS
+    loop0   -> S
+;
+    13      -> Ot       ; CR
+    10      -> Ot       ; LF
+    p20     -> T        ; Halt
+    .entry  start
