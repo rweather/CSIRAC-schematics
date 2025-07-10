@@ -495,6 +495,20 @@ static int csirac_media_get_flexowriter
              * as the actual Flexowriter line feed is used for "erase". */
             *word = 0x001D;
             return 1;
+        } else if (ch == 'b') {
+            /* Convert 'b' into the "blank" symbol */
+            *word = 0;
+            return 1;
+        } else if (ch == 's') {
+            /* Convert 's' into the "stop" symbol, which needs figure shift */
+            if (!(media->figure_shift)) {
+                media->figure_shift = 1;
+                media->ch = 0x0011;
+                *word = 0x001B;
+            } else {
+                *word = 0x0011;
+            }
+            return 1;
         } else if (ch == 'f' ) {
             /* Explicit change to figure shift mode */
             media->figure_shift = 1;
@@ -504,6 +518,16 @@ static int csirac_media_get_flexowriter
             /* Explicit change to letter shift mode */
             media->figure_shift = 0;
             *word = 0x001E;
+            return 1;
+        } else if (ch == '$' ) {
+            /* Map the dollar sign to the Flexowriter's pound sign */
+            if (!(media->figure_shift)) {
+                media->figure_shift = 1;
+                media->ch = 0x0012;
+                *word = 0x001B;
+            } else {
+                *word = 0x0012;
+            }
             return 1;
         } else if (csirac_media_lookup_teleprinter
                         (media->figure_shift, ch, flexowriter_to_unicode,
