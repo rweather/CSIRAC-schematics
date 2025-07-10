@@ -33,6 +33,57 @@ static const char * const destinations[32] = {
     "HU", "S", "PS", "CS", "PK", "MA", "MB", "MC", "MD", "T"
 };
 
+/**
+ * @brief Multiply two signed 19-bit numbers to produce a signed 38-bit result.
+ *
+ * @param[in] x First number.
+ * @param[in] y Second number.
+ *
+ * @return The product of @a x and @a y.
+ *
+ * CSIRAC multiplication is not standard integer multiplication.
+ * The input words are interpreted as real numbered values between
+ * -1 (inclusive) and 1 (exclusive).
+ *
+ * Effectively we have a multiplication of two signed 19-bit numbers
+ * to produce a signed 38-bit result.  After adding the sign bit back
+ * and shifting up by 1 bit position to put the sign back into the MSB,
+ * we get a final 40-bit double word as the result.
+ */
+static uint64_t csirac_multiply(csirac_word_t x, csirac_word_t y)
+{
+    int sign = 0;
+    int32_t x2 = (int32_t)x;
+    int32_t y2 = (int32_t)y;
+    int64_t product;
+
+    /* Convert the values into their absolute counterparts and
+     * figure out the sign of the result */
+    if ((x2 & CSIRAC_WORD_MSB_MASK) != 0) {
+        sign = 1;
+        x2 = (x2 ^ CSIRAC_WORD_MASK) + 1;
+    }
+    if ((y2 & CSIRAC_WORD_MSB_MASK) != 0) {
+        sign = !sign;
+        y2 = (y2 ^ CSIRAC_WORD_MASK) + 1;
+    }
+
+    /* Calculate the product of two 19-bit numbers to get a 38-bit result */
+    product = ((int64_t)x2) * y2;
+
+    /* Multiply by 2 to create a 39-bit result */
+    product *= 2;
+
+    /* Negate the result if the sign is negative and clamp to 40 bits */
+    if (sign) {
+        product = -product;
+    }
+    product &= 0x000000FFFFFFFFFFL;
+
+    /* Return the result to the caller */
+    return (uint64_t)product;
+}
+
 csirac_step_state_t csirac_step(csirac_state_t *state)
 {
     csirac_word_t I;
@@ -358,22 +409,11 @@ csirac_step_state_t csirac_step(csirac_state_t *state)
         /*
          * Multiply W by C, add the high word of the result to A, and
          * put the low word of the result in B.
-         *
-         * W and C are assumed to be in standard fixed-point form with
-         * the sign bits in the MSB's and the decimal point just to the
-         * right of the sign bit.  This permits -1 <= x < 1 to be
-         * represented in 20-bit words.
-         *
-         * Effectively we are multiplying two 19-bit signed values, which
-         * produces a 38-bit result plus a sign bit for the result.
-         * The sign and the top 19 bits of the result are added to A.
-         * The bottom 19 bits of the result are put in B with the LSB = 0.
          */
-        uint64_t product = ((uint64_t)W) * state->C;
+        uint64_t product = csirac_multiply(W, state->C);
         state->A += (csirac_word_t)(product >> 20);
         state->A &= CSIRAC_WORD_MASK;
-        state->B = ((csirac_word_t)(product & CSIRAC_WORD_MASK)) &
-                   ~CSIRAC_WORD_LSB_MASK;
+        state->B = (csirac_word_t)(product & CSIRAC_WORD_MASK);
 
         /* I'm assuming that the multiplication is done in 20 clock cycles,
          * one bit at a time.  Credit 19 extra clock cycles. */
